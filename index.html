@@ -470,7 +470,11 @@
 
             grid.innerHTML = filteredProjects.map(project => `
                 <div class="project-card">
-                    <div class="project-image">${project.icon}</div>
+                    <div class="project-image">
+                        ${project.icon.endsWith(".png") || project.icon.endsWith(".jpg") || project.icon.endsWith(".jpeg") || project.icon.endsWith(".svg")
+                        ? `<img src="${project.icon}" alt="${project.name}" style="max-width:100%; max-height:100%;">`
+                        : project.icon}
+                    </div>
                     <div class="project-content">
                         <h3 class="project-title">${project.name}</h3>
                         <p class="project-description">${project.description}</p>
