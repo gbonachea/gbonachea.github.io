@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<!-- saved from url=(0045)https://gbonachea.github.io/aplicationpy.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Proyectos - Aplicaciones en Electron</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            padding: 40px 20px;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .filter-btn.active {
+            background: #764ba2;
+            color: white;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .project-image {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            color: white;
+        }
+
+        .project-content {
+            padding: 25px;
+        }
+
+        .project-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .project-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            background: #f0f0f0;
+            color: #667eea;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .project-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: block;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .add-project-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: #764ba2;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 2em;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .add-project-btn:hover {
+            transform: scale(1.1);
+            background: #5a3780;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-content h2 {
+            color: #667eea;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Mis Proyectos</h1>
+            <p>Creacion y Desarrollo de Aplicativos en Electron para Linux</p>
+        </header>
+
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">Todos</button>
+            <button class="filter-btn" data-filter="web">Web</button>
+            <button class="filter-btn" data-filter="multimedia">Multimedia</button>
+            <button class="filter-btn" data-filter="admin">Administrador</button>
+            <button class="filter-btn" data-filter="utility">Utilidades</button>
+        </div>
+
+        <div class="projects-grid" id="projectsGrid">
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="./electron_files/whatsapp.png" alt="Whatsapp" style="max-width:100%; max-height:100%;">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Whatsapp</h3>
+                        <p class="project-description">Whatsapp Web Desktop para un funcinamiento nativo en Linux.</p>
+                        <div class="project-tags">
+                            <span class="tag">Node.js</span><span class="tag">Elecron</span><span class="tag">JavaScript</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="https://github.com/gbonachea/whatsapp-Webapps/releases/download/whatsapp/whatsapp_1.0_all.deb" class="btn btn-primary">Ver Demo</a>
+                            <a href="https://github.com/gbonachea/whatsapp-Webapps" class="btn btn-secondary">Código</a>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="./electron_files/instagram.png" alt="Instagram" style="max-width:100%; max-height:100%;">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Instagram</h3>
+                        <p class="project-description">Instagram Web Desktop para un funcinamiento nativo en Linux.</p>
+                        <div class="project-tags">
+                            <span class="tag">Node.js</span><span class="tag">Elecron</span><span class="tag">JavaScript</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="https://github.com/gbonachea/Instagram-Webapps/releases/download/instagram/instagram_1.0_all.deb" class="btn btn-primary">Ver Demo</a>
+                            <a href="https://github.com/gbonachea/Instagram-Webapps" class="btn btn-secondary">Código</a>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="./electron_files/messenger.png" alt="Messenger" style="max-width:100%; max-height:100%;">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Messenger</h3>
+                        <p class="project-description">Messenger Web Desktop para un funcinamiento nativo en Linux.</p>
+                        <div class="project-tags">
+                            <span class="tag">Node.js</span><span class="tag">Elecron</span><span class="tag">JavaScript</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="https://github.com/gbonachea/Messenger-Webapps/releases/download/messenger/messenger_1.0_all.deb" class="btn btn-primary">Ver Demo</a>
+                            <a href="https://github.com/gbonachea/Messenger-Webapps" class="btn btn-secondary">Código</a>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="project-card">
+                    <div class="project-image">
+                        <img src="./electron_files/youtube.png" alt="YouTube" style="max-width:100%; max-height:100%;">
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">YouTube</h3>
+                        <p class="project-description">YouTube Web Desktop para un funcinamiento nativo en Linux.</p>
+                        <div class="project-tags">
+                            <span class="tag">Node.js</span><span class="tag">Elecron</span><span class="tag">JavaScript</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="https://gbonachea.github.io/aplicationpy.html#" class="btn btn-primary">Ver Demo</a>
+                            <a href="https://gbonachea.github.io/h#" class="btn btn-secondary">Código</a>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="project-card">
+                    <div class="project-image">
+                        🎨
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Panel Desktop</h3>
+                        <p class="project-description">Sitio web personal con animaciones fluidas, modo oscuro y diseño completamente responsive.</p>
+                        <div class="project-tags">
+                            <span class="tag">Python</span><span class="tag">PyQT6</span><span class="tag">PyQT5</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="https://gbonachea.github.io/aplicationpy.html#" class="btn btn-primary">Ver Demo</a>
+                            <a href="https://github.com/gbonachea/Panel-Desktop" class="btn btn-secondary">Código</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <button class="add-project-btn" onclick="openModal()">+</button>
+
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <h2>Agregar Nuevo Proyecto</h2>
+            <form id="projectForm">
+                <div class="form-group">
+                    <label>Nombre del Proyecto</label>
+                    <input type="text" id="projectName" required="">
+                </div>
+                <div class="form-group">
+                    <label>Emoji/Icono</label>
+                    <input type="text" id="projectIcon" placeholder="🎨" maxlength="2">
+                </div>
+                <div class="form-group">
+                    <label>Descripción</label>
+                    <textarea id="projectDescription" required=""></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Tecnologías (separadas por comas)</label>
+                    <input type="text" id="projectTags" placeholder="React, Node.js, MongoDB">
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <input type="text" id="projectCategory" placeholder="web, mobile, backend, frontend">
+                </div>
+                <div class="form-group">
+                    <label>URL del Demo</label>
+                    <input type="url" id="projectDemo">
+                </div>
+                <div class="form-group">
+                    <label>URL del Código (GitHub)</label>
+                    <input type="url" id="projectCode">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Agregar Proyecto</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let projects = [
+            {
+                id: 9,
+                name: "Whatsapp",
+                icon: "./picture/whatsapp.png",
+                description: "Whatsapp Web Desktop para un funcinamiento nativo en Linux.",
+                tags: ["Node.js", "Elecron", "JavaScript"],
+                category: "web",
+                demo: "https://github.com/gbonachea/whatsapp-Webapps/releases/download/whatsapp/whatsapp_1.0_all.deb",
+                code: "https://github.com/gbonachea/whatsapp-Webapps"
+            },
+             {
+                id: 10,
+                name: "Instagram",
+                icon: "./picture/instagram.png",
+                description: "Instagram Web Desktop para un funcinamiento nativo en Linux.",
+                tags: ["Node.js", "Elecron", "JavaScript"],
+                category: "web",
+                demo: "https://github.com/gbonachea/Instagram-Webapps/releases/download/instagram/instagram_1.0_all.deb",
+                code: "https://github.com/gbonachea/Instagram-Webapps"
+            },
+             {
+                id: 11,
+                name: "Messenger",
+                icon: "./picture/messenger.png",
+                description: "Messenger Web Desktop para un funcinamiento nativo en Linux.",
+                tags: ["Node.js", "Elecron", "JavaScript"],
+                category: "web",
+                demo: "https://github.com/gbonachea/Messenger-Webapps/releases/download/messenger/messenger_1.0_all.deb",
+                code: "https://github.com/gbonachea/Messenger-Webapps"
+            },
+             {
+                id: 12,
+                name: "YouTube",
+                icon: "./picture/youtube.png",
+                description: "YouTube Web Desktop para un funcinamiento nativo en Linux.",
+                tags: ["Node.js", "Elecron", "JavaScript"],
+                category: "web",
+                demo: "#",
+                code: "h#"
+            },
+            {
+                id: 13,
+                name: "Electron",
+                icon: "🎨",
+                description: "#.",
+                tags: ["Node.js", "Elecron", "JavaScript"],
+                category: "Multimedia",
+                demo: "#",
+                code: "#"
+            }
+        ];
+
+        let currentFilter = 'all';
+
+        function renderProjects() {
+            const grid = document.getElementById('projectsGrid');
+            const filteredProjects = currentFilter === 'all' 
+                ? projects 
+                : projects.filter(p => p.category === currentFilter);
+
+            grid.innerHTML = filteredProjects.map(project => `
+                <div class="project-card">
+                    <div class="project-image">
+                        ${project.icon.endsWith(".png") || project.icon.endsWith(".jpg") || project.icon.endsWith(".jpeg") || project.icon.endsWith(".svg")
+                        ? `<img src="${project.icon}" alt="${project.name}" style="max-width:100%; max-height:100%;">`
+                        : project.icon}
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">${project.name}</h3>
+                        <p class="project-description">${project.description}</p>
+                        <div class="project-tags">
+                            ${project.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                        <div class="project-links">
+                            <a href="${project.demo}" class="btn btn-primary">Ver Demo</a>
+                            <a href="${project.code}" class="btn btn-secondary">Código</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                renderProjects();
+            });
+        });
+
+        function openModal() {
+            document.getElementById('projectModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('projectModal').classList.remove('active');
+            document.getElementById('projectForm').reset();
+        }
+
+        document.getElementById('projectForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newProject = {
+                id: Date.now(),
+                name: document.getElementById('projectName').value,
+                icon: document.getElementById('projectIcon').value || '📦',
+                description: document.getElementById('projectDescription').value,
+                tags: document.getElementById('projectTags').value.split(',').map(tag => tag.trim()),
+                category: document.getElementById('projectCategory').value || 'web',
+                demo: document.getElementById('projectDemo').value || '#',
+                code: document.getElementById('projectCode').value || '#'
+            };
+
+            projects.push(newProject);
+            renderProjects();
+            closeModal();
+        });
+
+        renderProjects();
+    </script>
+
+
+<protonpass-root-8be8 data-protonpass-role="root" data-protonpass-theme="os"><template shadowrootmode="closed"></template></protonpass-root-8be8></body></html>
