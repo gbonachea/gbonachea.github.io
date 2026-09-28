@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Navia Browser - Navegación Galáctica y Ultraligera</title>
+
+    <meta name="description" content="Navia Browser es un navegador web de alto rendimiento para Linux, construido sobre Qt 6 WebEngine y C++17. Privacidad avanzada, herramientas integradas y un consumo de memoria optimizado.">
+
+    <meta name="theme-color" content="#030712">
+
+    <link rel="icon" type="image/png" href="navia/Navia.png">
+
+    <link rel="apple-touch-icon" href="navia/Navia.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    
+
+    <style>
+
+        :root {
+
+            --bg-deep-space: #030712;
+
+            --bg-card: rgba(15, 23, 42, 0.75);
+
+            --bg-card-hover: rgba(30, 41, 59, 0.85);
+
+            --accent-cyan: #38bdf8;
+
+            --accent-violet: #818cf8;
+
+            --accent-glow: rgba(56, 189, 248, 0.35);
+
+            --text-main: #f8fafc;
+
+            --text-muted: #94a3b8;
+
+            --border-glow: rgba(129, 140, 248, 0.25);
+
+            --font-title: 'Orbitron', sans-serif;
+
+            --font-body: 'Rajdhani', sans-serif;
+
+        }
+
+        * {
+
+            box-sizing: border-box;
+
+            margin: 0;
+
+            padding: 0;
+
+        }
+
+        body {
+
+            background-color: var(--bg-deep-space);
+
+            color: var(--text-main);
+
+            font-family: var(--font-body);
+
+            font-size: 18px;
+
+            line-height: 1.6;
+
+            overflow-x: hidden;
+
+            background-image: 
+
+                radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.08) 0%, transparent 45%),
+
+                radial-gradient(circle at 85% 60%, rgba(129, 140, 248, 0.08) 0%, transparent 50%);
+
+            background-attachment: fixed;
+
+        }
+
+        h1, h2, h3, h4 {
+
+            font-family: var(--font-title);
+
+            letter-spacing: 1px;
+
+        }
+
+        /* --- BASE MODERNA: scroll, selección, foco, animaciones --- */
+
+        html {
+
+            scroll-behavior: smooth;
+
+            /* evita que el navbar fijo tape el inicio de cada sección */
+
+            scroll-padding-top: 96px;
+
+        }
+
+        ::selection {
+
+            background: rgba(56, 189, 248, 0.3);
+
+            color: #ffffff;
+
+        }
+
+        *:focus-visible {
+
+            outline: 2px solid var(--accent-cyan);
+
+            outline-offset: 3px;
+
+            border-radius: 4px;
+
+        }
+
+        ::-webkit-scrollbar {
+
+            width: 10px;
+
+        }
+
+        ::-webkit-scrollbar-track {
+
+            background: var(--bg-deep-space);
+
+        }
+
+        ::-webkit-scrollbar-thumb {
+
+            background: linear-gradient(180deg, var(--accent-cyan), var(--accent-violet));
+
+            border-radius: 10px;
+
+            border: 2px solid var(--bg-deep-space);
+
+        }
+
+        /* Revelado progresivo al hacer scroll */
+
+        .reveal {
+
+            opacity: 0;
+
+            transform: translateY(26px);
+
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+
+        }
+
+        .reveal.visible {
+
+            opacity: 1;
+
+            transform: translateY(0);
+
+        }
+
+        /* Respetamos la preferencia de menos movimiento */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            html {
+
+                scroll-behavior: auto;
+
+            }
+
+            .reveal {
+
+                opacity: 1;
+
+                transform: none;
+
+                transition: none;
+
+            }
+
+            * {
+
+                animation-duration: 0.01ms !important;
+
+                transition-duration: 0.01ms !important;
+
+            }
+
+        }
+
+        /* --- NAV BAR --- */
+
+        .navbar {
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            padding: 1.2rem 4rem;
+
+            background: rgba(3, 7, 18, 0.85);
+
+            backdrop-filter: blur(12px);
+
+            border-bottom: 1px solid var(--border-glow);
+
+            z-index: 1000;
+
+        }
+
+        .logo {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            font-family: var(--font-title);
+
+            font-weight: 800;
+
+            font-size: 1.5rem;
+
+            color: var(--accent-cyan);
+
+            text-shadow: 0 0 12px var(--accent-glow);
+
+        }
+
+        .logo-icon {
+
+            width: 36px;
+
+            height: 36px;
+
+            border-radius: 50%;
+
+            object-fit: cover;
+
+            border: 1px solid var(--border-glow);
+
+            box-shadow: 0 0 15px var(--accent-glow);
+
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+        }
+
+        .logo:hover .logo-icon {
+
+            transform: scale(1.08) rotate(-6deg);
+
+            box-shadow: 0 0 24px rgba(56, 189, 248, 0.6);
+
+        }
+
+        .logo-text-accent {
+
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-violet));
+
+            -webkit-background-clip: text;
+
+            background-clip: text;
+
+            -webkit-text-fill-color: transparent;
+
+        }
+
+        .nav-links {
+
+            display: flex;
+
+            list-style: none;
+
+            gap: 2rem;
+
+        }
+
+        .nav-links a {
+
+            color: var(--text-muted);
+
+            text-decoration: none;
+
+            font-weight: 600;
+
+            position: relative;
+
+            padding-bottom: 4px;
+
+            transition: color 0.3s, text-shadow 0.3s;
+
+        }
+
+        .nav-links a::after {
+
+            content: '';
+
+            position: absolute;
+
+            left: 0;
+
+            bottom: 0;
+
+            width: 0;
+
+            height: 2px;
+
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-violet));
+
+            border-radius: 2px;
+
+            transition: width 0.3s ease;
+
+        }
+
+        .nav-links a:hover::after,
+
+        .nav-links a:focus-visible::after {
+
+            width: 100%;
+
+        }
+
+        .nav-links a:hover {
+
+            color: var(--accent-cyan);
+
+            text-shadow: 0 0 8px var(--accent-glow);
+
+        }
+
+        /* --- HERO SECTION --- */
+
+        .hero {
+
+            padding: 10rem 2rem 6rem;
+
+            text-align: center;
+
+            max-width: 1100px;
+
+            margin: 0 auto;
+
+            position: relative;
+
+        }
+
+        .hero-title {
+
+            font-size: 3.5rem;
+
+            margin-bottom: 1rem;
+
+            background: linear-gradient(180deg, #ffffff 30%, var(--accent-cyan) 100%);
+
+            -webkit-background-clip: text;
+
+            -webkit-text-fill-color: transparent;
+
+            filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.2));
+
+        }
+
+        .hero-subtitle {
+
+            font-size: 1.3rem;
+
+            color: var(--text-muted);
+
+            max-width: 750px;
+
+            margin: 0 auto 2.5rem;
+
+        }
+
+        .hero-btns {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 1.5rem;
+
+            flex-wrap: wrap;
+
+        }
+
+        .btn {
+
+            padding: 0.8rem 2rem;
+
+            font-family: var(--font-title);
+
+            font-size: 0.95rem;
+
+            font-weight: 600;
+
+            border-radius: 6px;
+
+            text-decoration: none;
+
+            cursor: pointer;
+
+            transition: all 0.3s ease;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+        }
+
+        .btn {
+
+            position: relative;
+
+            overflow: hidden;
+
+        }
+
+        .btn-primary {
+
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+
+            color: #000;
+
+            border: none;
+
+            box-shadow: 0 0 20px var(--accent-glow);
+
+        }
+
+        /* brillo que recorre el botón al pasar el cursor */
+
+        .btn::after {
+
+            content: '';
+
+            position: absolute;
+
+            top: 0;
+
+            left: -120%;
+
+            width: 60%;
+
+            height: 100%;
+
+            background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+
+            transform: skewX(-20deg);
+
+            transition: left 0.6s ease;
+
+            pointer-events: none;
+
+        }
+
+        .btn:hover::after {
+
+            left: 130%;
+
+        }
+
+        .btn-primary:hover {
+
+            transform: translateY(-2px);
+
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.6);
+
+        }
+
+        .btn-secondary {
+
+            background: transparent;
+
+            color: var(--text-main);
+
+            border: 1px solid var(--border-glow);
+
+        }
+
+        .btn-secondary:hover {
+
+            background: rgba(129, 140, 248, 0.1);
+
+            border-color: var(--accent-cyan);
+
+            color: var(--accent-cyan);
+
+        }
+
+        /* --- SECCIÓN SOBRE NAVIA --- */
+
+        .about-lead {
+
+            max-width: 880px;
+
+            margin: 0 auto 3.5rem;
+
+            text-align: center;
+
+        }
+
+        .about-lead p {
+
+            color: var(--text-muted);
+
+            font-size: 1.05rem;
+
+            margin-bottom: 1.2rem;
+
+        }
+
+        .about-lead p:last-child {
+
+            margin-bottom: 0;
+
+        }
+
+        .about-lead strong {
+
+            color: var(--text-main);
+
+            font-weight: 600;
+
+        }
+
+        .about-pillars {
+
+            display: grid;
+
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+
+            gap: 1.5rem;
+
+            margin-bottom: 3rem;
+
+        }
+
+        .about-pillar {
+
+            background: var(--bg-card);
+
+            border: 1px solid var(--border-glow);
+
+            border-radius: 12px;
+
+            padding: 2rem;
+
+            position: relative;
+
+            overflow: hidden;
+
+            transition: border-color 0.3s, transform 0.3s;
+
+        }
+
+        .about-pillar::before {
+
+            content: '';
+
+            position: absolute;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 2px;
+
+            background: linear-gradient(90deg, var(--accent-cyan), transparent 70%);
+
+        }
+
+        .about-pillar:hover {
+
+            border-color: var(--accent-cyan);
+
+            transform: translateY(-4px);
+
+        }
+
+        .about-tag {
+
+            display: inline-block;
+
+            font-family: var(--font-title);
+
+            font-size: 0.7rem;
+
+            font-weight: 600;
+
+            letter-spacing: 2px;
+
+            text-transform: uppercase;
+
+            color: var(--accent-cyan);
+
+            margin-bottom: 0.8rem;
+
+        }
+
+        .about-pillar h3 {
+
+            font-size: 1.2rem;
+
+            margin-bottom: 1.2rem;
+
+            color: var(--text-main);
+
+        }
+
+        .about-pillar ul {
+
+            list-style: none;
+
+        }
+
+        .about-pillar li {
+
+            position: relative;
+
+            padding-left: 1.2rem;
+
+            margin-bottom: 0.85rem;
+
+            font-size: 0.95rem;
+
+            color: var(--text-muted);
+
+            line-height: 1.55;
+
+        }
+
+        .about-pillar li:last-child {
+
+            margin-bottom: 0;
+
+        }
+
+        .about-pillar li::before {
+
+            content: '';
+
+            position: absolute;
+
+            left: 0;
+
+            top: 0.65em;
+
+            width: 6px;
+
+            height: 6px;
+
+            border-radius: 50%;
+
+            background: var(--accent-violet);
+
+            box-shadow: 0 0 8px var(--accent-violet);
+
+        }
+
+        .about-pillar li strong {
+
+            color: var(--text-main);
+
+            font-weight: 600;
+
+        }
+
+        .about-highlights {
+
+            display: grid;
+
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+
+            gap: 1.5rem;
+
+            margin-bottom: 3rem;
+
+        }
+
+        .about-highlight {
+
+            background: rgba(255, 255, 255, 0.02);
+
+            border: 1px solid var(--border-glow);
+
+            border-radius: 10px;
+
+            padding: 1.75rem;
+
+            text-align: center;
+
+        }
+
+        .about-highlight strong {
+
+            display: block;
+
+            font-family: var(--font-title);
+
+            font-size: 2rem;
+
+            color: var(--accent-cyan);
+
+            text-shadow: 0 0 15px var(--accent-glow);
+
+            margin-bottom: 0.3rem;
+
+        }
+
+        .about-highlight span {
+
+            font-size: 0.85rem;
+
+            color: var(--text-muted);
+
+        }
+
+        .about-note {
+
+            border-left: 3px solid var(--accent-violet);
+
+            background: var(--bg-card);
+
+            border-radius: 0 10px 10px 0;
+
+            padding: 1.5rem 2rem;
+
+        }
+
+        .about-note p {
+
+            color: var(--text-muted);
+
+            font-size: 0.92rem;
+
+        }
+
+        .about-note strong {
+
+            color: var(--text-main);
+
+            font-weight: 600;
+
+        }
+
+        /* --- GALERÍA DIDÁCTICA --- */
+
+        .section-container {
+
+            max-width: 1200px;
+
+            margin: 0 auto;
+
+            padding: 5rem 2rem;
+
+        }
+
+        .section-title {
+
+            text-align: center;
+
+            font-size: 2.2rem;
+
+            margin-bottom: 3rem;
+
+            color: var(--text-main);
+
+            position: relative;
+
+        }
+
+        .section-title::after {
+
+            content: '';
+
+            display: block;
+
+            width: 60px;
+
+            height: 3px;
+
+            background: var(--accent-cyan);
+
+            margin: 0.8rem auto 0;
+
+            box-shadow: 0 0 10px var(--accent-cyan);
+
+        }
+
+        .gallery-wrapper {
+
+            display: grid;
+
+            grid-template-columns: 2fr 1fr;
+
+            gap: 2rem;
+
+            background: var(--bg-card);
+
+            border: 1px solid var(--border-glow);
+
+            border-radius: 12px;
+
+            padding: 1.5rem;
+
+            backdrop-filter: blur(10px);
+
+        }
+
+        .gallery-main {
+
+            position: relative;
+
+            border-radius: 10px;
+
+            overflow: hidden;
+
+            border: 1px solid rgba(255, 255, 255, 0.14);
+
+            box-shadow: 0 0 0 1px rgba(3, 7, 18, 0.6), 0 8px 30px rgba(0, 0, 0, 0.45);
+
+            aspect-ratio: 1366 / 728;
+
+            min-height: 0;
+
+            align-self: start;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #05070f;
+
+        }
+
+        .gallery-main img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: contain;
+
+            display: block;
+
+        }
+
+        .gallery-caption {
+
+            position: absolute;
+
+            bottom: 0;
+
+            left: 0;
+
+            right: 0;
+
+            padding: 1.5rem;
+
+            background: linear-gradient(transparent, rgba(3, 7, 18, 0.95));
+
+        }
+
+        .gallery-caption h4 {
+
+            color: var(--accent-cyan);
+
+            margin-bottom: 0.3rem;
+
+        }
+
+        .gallery-caption p {
+
+            font-size: 0.95rem;
+
+            color: var(--text-muted);
+
+        }
+
+        .gallery-thumbs {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 1rem;
+
+        }
+
+        .thumb-card {
+
+            background: rgba(255, 255, 255, 0.03);
+
+            border: 1px solid var(--border-glow);
+
+            border-radius: 8px;
+
+            padding: 1rem;
+
+            cursor: pointer;
+
+            transition: all 0.3s;
+
+        }
+
+        .thumb-card:hover, .thumb-card.active {
+
+            border-color: var(--accent-cyan);
+
+            background: var(--bg-card-hover);
+
+            transform: translateX(5px);
+
+        }
+
+        .thumb-card h5 {
+
+            font-family: var(--font-title);
+
+            color: var(--text-main);
+
+            font-size: 1rem;
+
+        }
+
+        .thumb-card p {
+
+            font-size: 0.85rem;
+
+            color: var(--text-muted);
+
+        }
+
+        /* --- SECCIÓN DESCARGAS --- */
+
+        .downloads-container {
+
+            background: var(--bg-card);
+
+            border: 1px solid var(--border-glow);
+
+            border-radius: 12px;
+
+            padding: 2.5rem;
+
+            margin-top: 2rem;
+
+        }
+
+        .version-tabs {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 1rem;
+
+            margin-bottom: 2rem;
+
+        }
+
+        .tab-btn {
+
+            padding: 0.6rem 1.5rem;
+
+            background: transparent;
+
+            border: 1px solid var(--border-glow);
+
+            color: var(--text-muted);
+
+            font-family: var(--font-title);
+
+            border-radius: 20px;
+
+            cursor: pointer;
+
+            transition: all 0.3s;
+
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+
+            background: var(--accent-cyan);
+
+            color: #000;
+
+            border-color: var(--accent-cyan);
+
+            box-shadow: 0 0 15px var(--accent-glow);
+
+        }
+
+        .download-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+            gap: 1.5rem;
+
+        }
+
+        .download-card {
+
+            background: rgba(255, 255, 255, 0.02);
+
+            border: 1px solid rgba(255, 255, 255, 0.08);
+
+            border-radius: 8px;
+
+            padding: 1.5rem;
+
+            text-align: center;
+
+            transition: border-color 0.3s;
+
+        }
+
+        .download-card:hover {
+
+            border-color: var(--accent-violet);
+
+        }
+
+        .download-card h4 {
+
+            margin-bottom: 0.5rem;
+
+            color: var(--accent-cyan);
+
+        }
+
+        .download-card p {
+
+            font-size: 0.85rem;
+
+            color: var(--text-muted);
+
+            margin-bottom: 1.2rem;
+
+        }
+
+        /* --- ESPECIFICACIONES TÉCNICAS --- */
+
+        .specs-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+
+            gap: 1.5rem;
+
+        }
+
+        .spec-card {
+
+            background: var(--bg-card);
+
+            border: 1px solid var(--border-glow);
+
+            border-radius: 10px;
+
+            padding: 1.5rem;
+
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 1rem;
+
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+
+        }
+
+        .spec-card:hover {
+
+            transform: translateY(-4px);
+
+            border-color: var(--accent-cyan);
+
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+
+        }
+
+        .spec-icon {
+
+            font-size: 2rem;
+
+            line-height: 1;
+
+            color: var(--accent-cyan);
+
+        }
+
+        .spec-info h4 {
+
+            font-size: 1.1rem;
+
+            margin-bottom: 0.2rem;
+
+            color: var(--text-main);
+
+        }
+
+        .spec-info p {
+
+            font-size: 0.9rem;
+
+            color: var(--text-muted);
+
+        }
+
+        /* --- COMUNIDAD Y DONACIONES --- */
+
+        .dual-section {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 2rem;
+
+        }
+
+        .info-box {
+
+            background: var(--bg-card);
+
+            border: 1px solid var(--border-glow);
+
+            border-radius: 12px;
+
+            padding: 2rem;
+
+        }
+
+        .info-box h3 {
+
+            color: var(--accent-cyan);
+
+            margin-bottom: 1rem;
+
+        }
+
+        .info-box p {
+
+            color: var(--text-muted);
+
+            margin-bottom: 1.5rem;
+
+            font-size: 0.95rem;
+
+        }
+
+        /* --- FOOTER --- */
+
+        footer {
+
+            text-align: center;
+
+            padding: 3rem 2rem;
+
+            border-top: 1px solid var(--border-glow);
+
+            color: var(--text-muted);
+
+            font-size: 0.85rem;
+
+            margin-top: 4rem;
+
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 900px) {
+
+            .gallery-wrapper, .dual-section {
+
+                grid-template-columns: 1fr;
+
+            }
+
+            .nav-links {
+
+                flex-wrap: wrap;
+
+                justify-content: flex-end;
+
+                gap: 1rem;
+
+                row-gap: 0.6rem;
+
+            }
+
+            .navbar {
+
+                padding: 1rem 2rem;
+
+            }
+
+            .hero-title {
+
+                font-size: 2.5rem;
+
+            }
+
+            .gallery-main {
+
+                aspect-ratio: auto;
+
+                min-height: 220px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- BARRA DE NAVEGACIÓN -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+
+            <img class="logo-icon" src="navia/Navia About.png" alt="Navia Browser" width="36" height="36">
+
+            <span class="logo-text">NAVIA <span class="logo-text-accent">BROWSER</span></span>
+
+        </div>
+
+        <ul class="nav-links">
+
+            <li><a href="#sobre">Sobre Navia</a></li>
+
+            <li><a href="#galeria">Características</a></li>
+
+            <li><a href="#descargas">Descargar</a></li>
+
+            <li><a href="#especificaciones">Especificaciones</a></li>
+
+            <li><a href="#comunidad">Comunidad</a></li>
+
+        </ul>
+
+    </nav>
+
+    <!-- HERO SECTION -->
+
+    <header class="hero">
+
+        <h1 class="hero-title">EXPLORA EL MULTIVERSO WEB</h1>
+
+        <p class="hero-subtitle">Un navegador ultraligero de estética galáctica, diseñado para máxima velocidad, bajo consumo de recursos y total soberanía sobre tus datos.</p>
+
+        <div class="hero-btns">
+
+            <a href="#descargas" class="btn btn-primary">Descargar Ahora</a>
+
+            <a href="https://github.com/gbonachea/Navia-Browser" target="_blank" class="btn btn-secondary">Ver en GitHub</a>
+
+        </div>
+
+    </header>
+
+    <!-- DESCRIPCIÓN COMERCIAL DEL NAVEGADOR -->
+
+    <section id="sobre" class="section-container">
+
+        <h2 class="section-title">Sobre Navia Browser</h2>
+
+        <div class="about-lead">
+
+            <p><strong>Navia Browser es un navegador web de alto rendimiento para Linux</strong>, construido sobre Qt 6 WebEngine y C++17. Su propuesta es clara: mantener la compatibilidad, la seguridad y el confort de uso que se esperan de un navegador de escritorio, con un consumo de recursos muy por debajo de lo habitual en el mercado.</p>
+
+            <p>La arquitectura se apoya en una decisión de diseño concreta: los módulos pesados no se cargan de forma permanente. Navia aplica políticas estrictas de contención —límite de procesos en segundo plano, carga diferida de los filtros y una página de inicio que no realiza peticiones de red— para que el rendimiento se adapte al equipo del usuario y no al revés.</p>
+
+        </div>
+
+        <div class="about-pillars">
+
+            <article class="about-pillar">
+
+                <span class="about-tag">Privacidad</span>
+
+                <h3>Seguridad por defecto</h3>
+
+                <ul>
+
+                    <li><strong>Anti-fingerprinting.</strong> Inyección de scripts al inicio de cada página para aleatorizar las firmas del navegador (toDataURL y fillText), dificultando el rastreo de la identidad digital del usuario.</li>
+
+                    <li><strong>Bloqueador de anuncios integrado.</strong> Basado en la lista EasyList y optimizado mediante indexación avanzada en tablas hash, de modo que el filtrado no penaliza la velocidad de navegación.</li>
+
+                    <li><strong>Control total de los datos.</strong> Gestión de cookies, borrado automático al cerrar sesión, limpieza de la caché HTTP y validación segura de certificados SSL.</li>
+
+                </ul>
+
+            </article>
+
+            <article class="about-pillar">
+
+                <span class="about-tag">Herramientas</span>
+
+                <h3>Funcionalidad integrada, sin extensiones</h3>
+
+                <ul>
+
+                    <li><strong>Visor PDF nativo.</strong> Apertura y lectura de documentos dentro del navegador mediante QtPdf, con zoom y navegación por página.</li>
+
+                    <li><strong>Gestor de descargas persistente.</strong> Pausa, reanudación y cancelación de descargas con seguimiento de progreso en tiempo real.</li>
+
+                    <li><strong>Soporte DRM (Widevine).</strong> Reproducción compatible con Netflix, Amazon Prime Video y Disney+.</li>
+
+                    <li><strong>Traducción integrada.</strong> Traducción de sitios web en un clic a través de Google Translate.</li>
+
+                    <li><strong>Herramientas de desarrollo.</strong> Inspector web completo (F12), visor de código fuente (Ctrl+U), exportación de páginas a PDF y configuración nativa de proxy HTTP y SOCKS5 con autenticación.</li>
+
+                </ul>
+
+            </article>
+
+            <article class="about-pillar">
+
+                <span class="about-tag">Rendimiento</span>
+
+                <h3>Eficiencia de memoria</h3>
+
+                <ul>
+
+                    <li><strong>Límite de procesos renderer.</strong> Los procesos en segundo plano se restringen a un máximo de 3, compartiendo recursos de forma inteligente entre las pestañas abiertas.</li>
+
+                    <li><strong>Carga diferida de filtros.</strong> El bloqueador de anuncios únicamente consume recursos cuando está activo.</li>
+
+                    <li><strong>Nueva pestaña ultraligera.</strong> La página de inicio carga sin red y con un uso mínimo de CPU y memoria.</li>
+
+                    <li><strong>Caché acotada.</strong> Límite máximo de 256 MB de caché en disco para mantener el sistema ligero y con espacio disponible.</li>
+
+                </ul>
+
+            </article>
+
+            <article class="about-pillar">
+
+                <span class="about-tag">Experiencia</span>
+
+                <h3>Interfaz nativa y productividad</h3>
+
+                <ul>
+
+                    <li><strong>Ventana frameless.</strong> Interfaz oscura minimalista sin bordes del sistema, con redimensionamiento nativo y barra de herramientas integrada.</li>
+
+                    <li><strong>Página de inicio galáctica</strong> (<code>navia://newtab</code>), con accesos directos, reloj, buscador rápido y fondo personalizable.</li>
+
+                    <li><strong>Navegación intuitiva.</strong> Sistema de pestañas rápido y barra de direcciones inteligente que detecta URLs o realiza la búsqueda directamente en DuckDuckGo.</li>
+
+                    <li><strong>Vista previa de URLs</strong> en tiempo real y función de arrastrar y soltar archivos.</li>
+
+                </ul>
+
+            </article>
+
+        </div>
+
+        <div class="about-highlights">
+
+            <div class="about-highlight">
+
+                <strong>3</strong>
+
+                <span>procesos renderer como máximo en segundo plano</span>
+
+            </div>
+
+            <div class="about-highlight">
+
+                <strong>450 MB</strong>
+
+                <span>límite de caché en disco</span>
+
+            </div>
+
+            <div class="about-highlight">
+
+                <strong>~157 MB</strong>
+
+                <span>consumo de RAM en reposo</span>
+
+            </div>
+
+        </div>
+
+        <div class="about-note">
+
+            <p><strong>Requisitos y licencia.</strong> Navia Browser está disponible para Linux x86_64 (Debian, Ubuntu, Fedora, Arch Linux y derivadas) sobre Qt 6.11 —Widgets, WebEngine y Pdf—. Se distribuye como paquete portátil autocontenido o se compila desde el código fuente con CMake. Software libre publicado bajo la licencia <strong>GNU GPLv3</strong> y desarrollado por <strong>GusBonachea</strong> (ART Ripoll, B&amp;R Corp).</p>
+
+        </div>
+
+    </section>
+
+    <!-- GALERÍA DIDÁCTICA INTERACTIVA -->
+
+    <section id="galeria" class="section-container">
+
+        <h2 class="section-title">Experiencia de Navegación</h2>
+
+        <div class="gallery-wrapper">
+
+            <div class="gallery-main">
+
+                <img id="gallery-display" src="navia/navia-1.png" alt="Navia Browser — Interfaz principal">
+
+                <div class="gallery-caption">
+
+                    <h4 id="gallery-title">Interfaz Galáctica Oscura</h4>
+
+                    <p id="gallery-desc">Un diseño estilizado y minimalista enfocado en reducir la fatiga visual durante sesiones prolongadas.</p>
+
+                </div>
+
+            </div>
+
+            <div class="gallery-thumbs">
+
+                <div class="thumb-card active" onclick="updateGallery(0)">
+
+                    <h5>Diseño Galáctico</h5>
+
+                    <p>Estética espacial oscura e intutitiva.</p>
+
+                </div>
+
+                <div class="thumb-card" onclick="updateGallery(1)">
+
+                    <h5>Rendimiento Eficiente</h5>
+
+                    <p>Motor optimizado con respuesta inmediata.</p>
+
+                </div>
+
+                <div class="thumb-card" onclick="updateGallery(2)">
+
+                    <h5>Aislamiento de Ventanas</h5>
+
+                    <p>Privacidad y orden por espacios de trabajo.</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- DESCARGAS MULTIVERSION -->
+
+    <section id="descargas" class="section-container">
+
+        <h2 class="section-title">Descarga Navia Browser</h2>
+
+        <div class="downloads-container">
+
+            <div class="version-tabs">
+
+                <button class="tab-btn active" onclick="switchVersion('v2')">Versión Actual </button>
+
+                <button class="tab-btn" onclick="switchVersion('v1')">Versión Anterior </button>
+
+            </div>
+
+            <!-- Panel Versión 2.0 -->
+
+            <div id="v2-panel" class="download-grid">
+
+                <div class="download-card">
+
+                    <h4>Paquete .DEB</h4>
+
+                    <p>Para Debian, Ubuntu, Linux Mint y derivados.</p>
+
+                    <a href="https://github.com/gbonachea/Navia-Browser/releases/download/Navia-3.3/navia-browser_3.3_all.deb" class="btn btn-primary" style="width: 100%; justify-content: center;">Descargar .deb</a>
+
+                </div>
+
+                <div class="download-card">
+
+                    <h4>Instalador Stellar</h4>
+
+                    <p>Para toda distribucion GNU/Linux.</p>
+
+                    <a href="#" class="btn btn-primary" style="width: 100%; justify-content: center;">Descargar .rpm</a>
+
+                </div>
+
+                <div class="download-card">
+
+                    <h4>AppImage</h4>
+
+                    <p>Ejecutable portable para cualquier distribución Linux.</p>
+
+                    <a href="#" class="btn btn-primary" style="width: 100%; justify-content: center;">Descargar .AppImage</a>
+
+                </div>
+
+            </div>
+
+            <!-- Panel Versión 1.0 (Oculto por defecto) -->
+
+            <div id="v1-panel" class="download-grid" style="display: none;">
+
+                <div class="download-card">
+
+                    <h4>Paquete .DEB (v3.1)</h4>
+
+                    <p>Compilación heredada para sistemas antiguos.</p>
+
+                    <a href="https://github.com/gbonachea/Navia-Browser/releases/download/Navia-3/navia-browser_3.1_all.deb" class="btn btn-secondary" style="width: 100%; justify-content: center;">Descargar v3.1 .deb</a>
+
+                </div>
+
+                <div class="download-card">
+
+                    <h4>Instalador Stellar (v3.1)</h4>
+
+                    <p>Compatible con toda las distribuciones GNU/Linux.</p>
+
+                    <a href="#" class="btn btn-secondary" style="width: 100%; justify-content: center;">Descargar v3.1 .AppImage</a>
+
+                </div>
+
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+
+                <p style="color: var(--text-muted); font-size: 0.9rem;">¿Prefieres compilar desde el código fuente?</p>
+
+                <a href="https://github.com" target="_blank" style="color: var(--accent-cyan); font-weight: 600; text-decoration: none;">Explora el Repositorio Oficial en GitHub &rarr;</a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- FICHA TÉCNICA -->
+
+    <section id="especificaciones" class="section-container">
+
+        <h2 class="section-title">Ficha Técnica</h2>
+
+        <div class="specs-grid">
+
+            <div class="spec-card">
+
+                <div class="spec-icon">&#128187;</div>
+
+                <div class="spec-info">
+
+                    <h4>Sistemas Operativos</h4>
+
+                    <p>Compatible con Linux (64-bit). Próximamente en MacOS y Windows.</p>
+
+                </div>
+
+            </div>
+
+            <div class="spec-card">
+
+                <div class="spec-icon">&#9889;</div>
+
+                <div class="spec-info">
+
+                    <h4>Consumo de RAM</h4>
+
+                    <p>~157 MB en reposo. Ultraligero comparado con navegadores tradicionales.</p>
+
+                </div>
+
+            </div>
+
+            <div class="spec-card">
+
+                <div class="spec-icon">&#9881;</div>
+
+                <div class="spec-info">
+
+                    <h4>Tecnología Núcleo</h4>
+
+                    <p>Construido sobre Qt6 Widgets y la potencia de QtWebEngine.</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- COMUNIDAD Y DONACIONES -->
+
+    <section id="comunidad" class="section-container">
+
+        <div class="dual-section">
+
+            <div class="info-box">
+
+                <h3>Comunidad y Contribuciones</h3>
+
+                <p>Navia Browser es un proyecto de código abierto impulsado por desarrolladores apasionados. Puedes reportar errores, sugerir funcionalidades o contribuir directamente al código fuente.</p>
+
+                <a href="https://github.com/gbonachea" target="_blank" class="btn btn-secondary">Unirse en GitHub</a>
+
+            </div>
+
+            <div class="info-box">
+
+                <h3>Apoya el Proyecto</h3>
+
+                <p>Mantener el desarrollo libre de rastreadores y anuncios requiere recursos. Si encuentras útil Navia Browser, considera realizar una donación para financiar el servidor y el desarrollo continuo.</p>
+
+                <a href="#" class="btn btn-primary">Hacer una Donación</a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>&copy; 2026 Navia Browser Project. Distribuido bajo Licencia GPLv3.</p>
+
+    </footer>
+
+    <!-- JAVASCRIPT INTERACTIVO -->
+
+    <script>
+
+        // Revelado progresivo de secciones al entrar en pantalla.
+        // La clase se añade desde JS: si el script falla, el contenido sigue visible.
+
+        (function () {
+
+            const objetivos = document.querySelectorAll('.section-title, .gallery-wrapper, .downloads-container, .about-lead, .about-pillars, .about-highlights, .about-note, .specs-grid, .info-box');
+
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+
+                return;
+
+            }
+
+            // Si la pestaña no es visible no hay transiciones CSS (Chrome las
+            // congela), así que ni aplicamos el estado inicial: el contenido
+            // se queda visible y no arriesgamos que quede oculto.
+
+            if (document.visibilityState === 'hidden') {
+
+                return;
+
+            }
+
+            function mostrar(el) {
+
+                el.classList.add('visible');
+
+            }
+
+            // Estado final inmediato, sin depender de que una transición
+            // llegue a ejecutarse: se quita la clase y el elemento vuelve
+            // a su aspecto normal.
+
+            function mostrarYa(el) {
+
+                el.classList.remove('reveal');
+
+                el.classList.remove('visible');
+
+            }
+
+            // 1) Muestra de inmediato lo que ya está en pantalla (o por encima),
+            //    para que el primer impacto no espere a ninguna animación.
+
+            objetivos.forEach((el) => {
+
+                el.classList.add('reveal');
+
+                if (el.getBoundingClientRect().top < window.innerHeight) {
+
+                    mostrarYa(el);
+
+                }
+
+            });
+
+            // 2) El resto, cuando entra en pantalla.
+
+            if ('IntersectionObserver' in window) {
+
+                const observador = new IntersectionObserver((entradas) => {
+
+                    entradas.forEach((entrada) => {
+
+                        if (!entrada.isIntersecting) {
+
+                            return;
+
+                        }
+
+                        mostrar(entrada.target);
+
+                        observador.unobserve(entrada.target);
+
+                    });
+
+                }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+                objetivos.forEach((el) => {
+
+                    if (el.classList.contains('reveal')) {
+
+                        observador.observe(el);
+
+                    }
+
+                });
+
+            }
+
+            // 3) Red de seguridad: si el observer no llega a disparar,
+            //    mostramos todo el contenido de golpe.
+
+            setTimeout(() => {
+
+                objetivos.forEach((el) => {
+
+                    if (el.classList.contains('reveal')) {
+
+                        mostrarYa(el);
+
+                    }
+
+                });
+
+            }, 4000);
+
+        })();
+
+    </script>
+
+    <script>
+
+        // Datos para la Galería
+
+        const galleryData = [
+
+            {
+
+                image: "navia/navia-1.png",
+
+                title: "Interfaz Galáctica Oscura",
+
+                desc: "Un diseño estilizado y minimalista enfocado en reducir la fatiga visual durante sesiones prolongadas."
+
+            },
+
+            {
+
+                image: "navia/navia-1-1.png",
+
+                title: "Rendimiento Eficiente",
+
+                desc: "Consumo optimizado de recursos permitiendo fluidez extrema incluso en equipos con hardware modesto."
+
+            },
+
+            {
+
+                image: "navia/navia-2.png",
+
+                title: "Aislamiento de Ventanas",
+
+                desc: "Gestión inteligente de pestañas y espacios aislados para mayor enfoque y privacidad."
+
+            }
+
+        ];
+
+        function updateGallery(index) {
+
+            const mainImg = document.getElementById('gallery-display');
+
+            const title = document.getElementById('gallery-title');
+
+            const desc = document.getElementById('gallery-desc');
+
+            const thumbs = document.querySelectorAll('.thumb-card');
+
+            mainImg.src = galleryData[index].image;
+
+            title.textContent = galleryData[index].title;
+
+            desc.textContent = galleryData[index].desc;
+
+            thumbs.forEach((thumb, i) => {
+
+                if(i === index) {
+
+                    thumb.classList.add('active');
+
+                } else {
+
+                    thumb.classList.remove('active');
+
+                }
+
+            });
+
+        }
+
+        // Lógica de pestañas de Descargas
+
+        function switchVersion(version) {
+
+            const v2Panel = document.getElementById('v2-panel');
+
+            const v1Panel = document.getElementById('v1-panel');
+
+            const btns = document.querySelectorAll('.tab-btn');
+
+            if (version === 'v2') {
+
+                v2Panel.style.display = 'grid';
+
+                v1Panel.style.display = 'none';
+
+                btns[0].classList.add('active');
+
+                btns[1].classList.remove('active');
+
+            } else {
+
+                v2Panel.style.display = 'none';
+
+                v1Panel.style.display = 'grid';
+
+                btns[0].classList.remove('active');
+
+                btns[1].classList.add('active');
+
+            }
+
+        }
+
+    </script>
+
+</body>
+
+</html>
+
+
