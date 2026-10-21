@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<!-- saved from url=(0039)https://art-ripoll.github.io/navia.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StellarBox-WinDesktop</title>
+    <!-- Icono para barra de búsqueda y marcadores -->
+    <link rel="icon" type="image/png" href="https://gbonachea.github.io/picture/stellarbox.png">
+    <!-- Si tienes un .ico, puedes usar también: -->
+    <!-- <link rel="icon" href="Picture/favicon.ico"> -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0a0e27;
+            color: #fff;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 5%;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 2rem;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -250px;
+            right: -250px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(118, 75, 162, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -200px;
+            left: -200px;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-30px) scale(1.1); }
+        }
+
+        .hero-content {
+            max-width: 800px;
+            text-align: center;
+            z-index: 1;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: #a0aec0;
+            margin-bottom: 2.5rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #fff;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            transform: translateY(-3px);
+        }
+
+        .section {
+            padding: 5rem 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: #a0aec0;
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .content-block {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        .content-block h3 {
+            color: #667eea;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .content-block p {
+            color: #cbd5e0;
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+
+        .content-block ul {
+            color: #cbd5e0;
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .content-block li {
+            margin-bottom: 0.5rem;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 350px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed rgba(102, 126, 234, 0.5);
+            color: #667eea;
+            font-size: 1rem;
+            text-align: center;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .image-placeholder:hover {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .gallery-item {
+            height: 250px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border-radius: 15px;
+            border: 2px dashed rgba(102, 126, 234, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+            border-color: #667eea;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .feature-card p {
+            color: #a0aec0;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .spec-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .spec-label {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .spec-value {
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .download-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 30px;
+            padding: 4rem 2rem;
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .download-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .download-section p {
+            color: #a0aec0;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .version-info {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.2);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #667eea;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            margin-top: 5rem;
+            border-top: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        footer p {
+            color: #a0aec0;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .section {
+                padding: 3rem 5%;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .content-block {
+                padding: 2rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #667eea;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: particle-float linear infinite;
+        }
+
+        @keyframes particle-float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            90% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(50px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"><div class="particle" style="left: 10.106%; animation-duration: 5.82809s; animation-delay: 0.514713s;"></div><div class="particle" style="left: 6.35709%; animation-duration: 10.4578s; animation-delay: 0.249689s;"></div><div class="particle" style="left: 18.335%; animation-duration: 6.71755s; animation-delay: 3.56869s;"></div><div class="particle" style="left: 9.13799%; animation-duration: 8.3749s; animation-delay: 2.23892s;"></div><div class="particle" style="left: 93.8413%; animation-duration: 13.0044s; animation-delay: 4.61572s;"></div><div class="particle" style="left: 64.7762%; animation-duration: 8.34941s; animation-delay: 2.02901s;"></div><div class="particle" style="left: 79.1612%; animation-duration: 9.55477s; animation-delay: 0.330785s;"></div><div class="particle" style="left: 42.2191%; animation-duration: 5.92769s; animation-delay: 1.17972s;"></div><div class="particle" style="left: 65.4727%; animation-duration: 8.96164s; animation-delay: 2.14812s;"></div><div class="particle" style="left: 10.1468%; animation-duration: 5.53173s; animation-delay: 4.51688s;"></div><div class="particle" style="left: 26.9846%; animation-duration: 13.0706s; animation-delay: 4.07523s;"></div><div class="particle" style="left: 86.3244%; animation-duration: 10.0043s; animation-delay: 4.4016s;"></div><div class="particle" style="left: 49.0366%; animation-duration: 13.6876s; animation-delay: 0.121406s;"></div><div class="particle" style="left: 59.6444%; animation-duration: 10.7591s; animation-delay: 3.45405s;"></div><div class="particle" style="left: 3.15204%; animation-duration: 14.6143s; animation-delay: 3.44751s;"></div><div class="particle" style="left: 6.24558%; animation-duration: 8.58848s; animation-delay: 2.20707s;"></div><div class="particle" style="left: 31.2753%; animation-duration: 12.8283s; animation-delay: 3.59115s;"></div><div class="particle" style="left: 12.6498%; animation-duration: 12.9063s; animation-delay: 4.6234s;"></div><div class="particle" style="left: 74.9095%; animation-duration: 6.05188s; animation-delay: 1.81228s;"></div><div class="particle" style="left: 30.828%; animation-duration: 6.13449s; animation-delay: 3.11531s;"></div><div class="particle" style="left: 12.7445%; animation-duration: 5.51131s; animation-delay: 0.870414s;"></div><div class="particle" style="left: 7.07028%; animation-duration: 10.6083s; animation-delay: 2.3901s;"></div><div class="particle" style="left: 98.112%; animation-duration: 10.8811s; animation-delay: 3.16503s;"></div><div class="particle" style="left: 38.1535%; animation-duration: 6.1534s; animation-delay: 1.66795s;"></div><div class="particle" style="left: 87.1109%; animation-duration: 5.34583s; animation-delay: 3.65007s;"></div><div class="particle" style="left: 59.0896%; animation-duration: 8.46416s; animation-delay: 1.47256s;"></div><div class="particle" style="left: 27.7886%; animation-duration: 5.99948s; animation-delay: 1.33433s;"></div><div class="particle" style="left: 89.0245%; animation-duration: 14.1975s; animation-delay: 3.94605s;"></div><div class="particle" style="left: 20.2207%; animation-duration: 8.66168s; animation-delay: 4.89241s;"></div><div class="particle" style="left: 39.0898%; animation-duration: 9.94175s; animation-delay: 0.458388s;"></div><div class="particle" style="left: 39.7621%; animation-duration: 9.03201s; animation-delay: 0.36937s;"></div><div class="particle" style="left: 55.8581%; animation-duration: 11.8332s; animation-delay: 3.079s;"></div><div class="particle" style="left: 76.9195%; animation-duration: 12.4357s; animation-delay: 0.0125167s;"></div><div class="particle" style="left: 65.5313%; animation-duration: 8.90724s; animation-delay: 0.609946s;"></div><div class="particle" style="left: 92.4684%; animation-duration: 13.7321s; animation-delay: 2.27868s;"></div><div class="particle" style="left: 12.1889%; animation-duration: 9.00118s; animation-delay: 1.60021s;"></div><div class="particle" style="left: 98.1071%; animation-duration: 6.87731s; animation-delay: 1.20569s;"></div><div class="particle" style="left: 91.0007%; animation-duration: 7.30675s; animation-delay: 4.74199s;"></div><div class="particle" style="left: 18.9283%; animation-duration: 6.45874s; animation-delay: 3.81996s;"></div><div class="particle" style="left: 88.7852%; animation-duration: 8.18751s; animation-delay: 4.18527s;"></div><div class="particle" style="left: 55.3387%; animation-duration: 13.8133s; animation-delay: 4.10569s;"></div><div class="particle" style="left: 21.4844%; animation-duration: 5.81171s; animation-delay: 1.06208s;"></div><div class="particle" style="left: 84.05%; animation-duration: 7.182s; animation-delay: 2.68947s;"></div><div class="particle" style="left: 72.8489%; animation-duration: 11.8994s; animation-delay: 2.74828s;"></div><div class="particle" style="left: 25.0459%; animation-duration: 5.34716s; animation-delay: 3.35247s;"></div><div class="particle" style="left: 14.8299%; animation-duration: 11.0663s; animation-delay: 3.92427s;"></div><div class="particle" style="left: 10.4029%; animation-duration: 12.2328s; animation-delay: 0.114112s;"></div><div class="particle" style="left: 12.6591%; animation-duration: 9.80718s; animation-delay: 4.06559s;"></div><div class="particle" style="left: 59.519%; animation-duration: 9.03174s; animation-delay: 3.93735s;"></div><div class="particle" style="left: 98.449%; animation-duration: 6.00123s; animation-delay: 4.52425s;"></div><div class="particle" style="left: 60.2973%; animation-duration: 14.4229s; animation-delay: 2.47889s;"></div><div class="particle" style="left: 43.8427%; animation-duration: 7.18652s; animation-delay: 2.90067s;"></div><div class="particle" style="left: 74.1949%; animation-duration: 10.1901s; animation-delay: 2.28958s;"></div><div class="particle" style="left: 69.9565%; animation-duration: 7.47828s; animation-delay: 3.88935s;"></div><div class="particle" style="left: 92.3001%; animation-duration: 6.15832s; animation-delay: 4.96469s;"></div><div class="particle" style="left: 55.5332%; animation-duration: 7.25465s; animation-delay: 2.79567s;"></div><div class="particle" style="left: 62.5817%; animation-duration: 12.1876s; animation-delay: 1.44609s;"></div><div class="particle" style="left: 87.3113%; animation-duration: 6.98707s; animation-delay: 2.80982s;"></div><div class="particle" style="left: 40.0309%; animation-duration: 6.96975s; animation-delay: 4.60377s;"></div><div class="particle" style="left: 86.8918%; animation-duration: 13.7678s; animation-delay: 1.18959s;"></div><div class="particle" style="left: 27.2326%; animation-duration: 9.12376s; animation-delay: 0.501311s;"></div><div class="particle" style="left: 54.9335%; animation-duration: 11.2036s; animation-delay: 2.62674s;"></div><div class="particle" style="left: 72.8259%; animation-duration: 5.64349s; animation-delay: 2.30599s;"></div><div class="particle" style="left: 99.0236%; animation-duration: 7.729s; animation-delay: 4.38404s;"></div><div class="particle" style="left: 60.2712%; animation-duration: 9.00399s; animation-delay: 2.01185s;"></div><div class="particle" style="left: 75.5565%; animation-duration: 6.40415s; animation-delay: 1.04982s;"></div><div class="particle" style="left: 76.4896%; animation-duration: 5.46248s; animation-delay: 0.877985s;"></div><div class="particle" style="left: 92.2393%; animation-duration: 11.4095s; animation-delay: 1.79621s;"></div><div class="particle" style="left: 3.82948%; animation-duration: 6.20403s; animation-delay: 2.23321s;"></div><div class="particle" style="left: 47.2233%; animation-duration: 5.19075s; animation-delay: 4.63026s;"></div><div class="particle" style="left: 85.3243%; animation-duration: 9.32839s; animation-delay: 2.09979s;"></div><div class="particle" style="left: 65.8948%; animation-duration: 6.32049s; animation-delay: 4.38716s;"></div><div class="particle" style="left: 63.1355%; animation-duration: 7.71156s; animation-delay: 0.772292s;"></div><div class="particle" style="left: 89.9458%; animation-duration: 11.8615s; animation-delay: 4.14996s;"></div><div class="particle" style="left: 42.8055%; animation-duration: 11.5258s; animation-delay: 3.77874s;"></div><div class="particle" style="left: 25.0402%; animation-duration: 7.63748s; animation-delay: 0.312858s;"></div><div class="particle" style="left: 27.8889%; animation-duration: 10.4384s; animation-delay: 2.87908s;"></div><div class="particle" style="left: 2.39547%; animation-duration: 14.2086s; animation-delay: 2.43665s;"></div><div class="particle" style="left: 47.4418%; animation-duration: 14.0853s; animation-delay: 2.29073s;"></div><div class="particle" style="left: 6.50774%; animation-duration: 6.13927s; animation-delay: 1.91231s;"></div><div class="particle" style="left: 58.0382%; animation-duration: 8.70241s; animation-delay: 3.04551s;"></div><div class="particle" style="left: 38.3139%; animation-duration: 11.5697s; animation-delay: 1.52026s;"></div><div class="particle" style="left: 76.6251%; animation-duration: 12.4964s; animation-delay: 2.71825s;"></div><div class="particle" style="left: 1.22729%; animation-duration: 5.61439s; animation-delay: 3.08401s;"></div><div class="particle" style="left: 17.94%; animation-duration: 13.9736s; animation-delay: 2.32917s;"></div><div class="particle" style="left: 25.0969%; animation-duration: 5.91855s; animation-delay: 0.308661s;"></div><div class="particle" style="left: 22.8617%; animation-duration: 6.78725s; animation-delay: 1.31469s;"></div><div class="particle" style="left: 73.0989%; animation-duration: 12.2226s; animation-delay: 3.41254s;"></div><div class="particle" style="left: 64.9084%; animation-duration: 14.6036s; animation-delay: 4.48173s;"></div><div class="particle" style="left: 36.5055%; animation-duration: 13.2219s; animation-delay: 0.204479s;"></div><div class="particle" style="left: 18.6097%; animation-duration: 9.57238s; animation-delay: 1.59822s;"></div><div class="particle" style="left: 22.7814%; animation-duration: 9.64197s; animation-delay: 2.975s;"></div><div class="particle" style="left: 53.2385%; animation-duration: 6.76365s; animation-delay: 3.82208s;"></div><div class="particle" style="left: 46.0772%; animation-duration: 9.4372s; animation-delay: 2.90993s;"></div><div class="particle" style="left: 21.2154%; animation-duration: 5.75407s; animation-delay: 1.82532s;"></div><div class="particle" style="left: 82.2655%; animation-duration: 8.19308s; animation-delay: 1.28353s;"></div><div class="particle" style="left: 64.3341%; animation-duration: 12.7307s; animation-delay: 0.519873s;"></div><div class="particle" style="left: 86.564%; animation-duration: 14.8867s; animation-delay: 0.074082s;"></div><div class="particle" style="left: 48.1356%; animation-duration: 11.5661s; animation-delay: 3.76612s;"></div><div class="particle" style="left: 40.4823%; animation-duration: 9.4446s; animation-delay: 2.45305s;"></div><div class="particle" style="left: 4.1354%; animation-duration: 5.44737s; animation-delay: 3.47918s;"></div><div class="particle" style="left: 49.5365%; animation-duration: 14.1368s; animation-delay: 1.68622s;"></div><div class="particle" style="left: 80.095%; animation-duration: 7.94006s; animation-delay: 3.26618s;"></div><div class="particle" style="left: 97.5275%; animation-duration: 6.54073s; animation-delay: 1.21083s;"></div><div class="particle" style="left: 83.0366%; animation-duration: 13.3732s; animation-delay: 1.41178s;"></div><div class="particle" style="left: 3.07765%; animation-duration: 11.7158s; animation-delay: 2.01195s;"></div><div class="particle" style="left: 18.1315%; animation-duration: 8.19777s; animation-delay: 0.59104s;"></div><div class="particle" style="left: 6.32869%; animation-duration: 7.54899s; animation-delay: 2.08447s;"></div><div class="particle" style="left: 5.36411%; animation-duration: 11.4672s; animation-delay: 4.92567s;"></div><div class="particle" style="left: 80.9694%; animation-duration: 14.1364s; animation-delay: 2.74717s;"></div><div class="particle" style="left: 79.1931%; animation-duration: 10.115s; animation-delay: 3.32183s;"></div><div class="particle" style="left: 38.0455%; animation-duration: 12.6228s; animation-delay: 0.819054s;"></div><div class="particle" style="left: 14.3582%; animation-duration: 14.1761s; animation-delay: 3.55124s;"></div><div class="particle" style="left: 82.803%; animation-duration: 11.6238s; animation-delay: 2.03083s;"></div><div class="particle" style="left: 26.8266%; animation-duration: 12.4298s; animation-delay: 0.438416s;"></div><div class="particle" style="left: 63.6939%; animation-duration: 7.39321s; animation-delay: 2.63246s;"></div><div class="particle" style="left: 45.1569%; animation-duration: 12.1676s; animation-delay: 3.9103s;"></div><div class="particle" style="left: 66.9286%; animation-duration: 5.72202s; animation-delay: 2.34298s;"></div><div class="particle" style="left: 7.12205%; animation-duration: 14.4887s; animation-delay: 4.03963s;"></div><div class="particle" style="left: 75.5181%; animation-duration: 10.5554s; animation-delay: 2.7961s;"></div><div class="particle" style="left: 4.93374%; animation-duration: 12.7278s; animation-delay: 1.37833s;"></div><div class="particle" style="left: 39.8811%; animation-duration: 8.33293s; animation-delay: 0.461617s;"></div><div class="particle" style="left: 50.4711%; animation-duration: 12.037s; animation-delay: 3.78572s;"></div><div class="particle" style="left: 81.021%; animation-duration: 12.1021s; animation-delay: 1.06072s;"></div><div class="particle" style="left: 51.607%; animation-duration: 13.2873s; animation-delay: 1.01157s;"></div><div class="particle" style="left: 96.1782%; animation-duration: 8.37122s; animation-delay: 3.47243s;"></div><div class="particle" style="left: 60.1561%; animation-duration: 12.3058s; animation-delay: 3.94821s;"></div><div class="particle" style="left: 62.0555%; animation-duration: 6.00117s; animation-delay: 3.0608s;"></div><div class="particle" style="left: 30.8985%; animation-duration: 7.66464s; animation-delay: 0.797155s;"></div><div class="particle" style="left: 94.8233%; animation-duration: 10.7785s; animation-delay: 0.999595s;"></div><div class="particle" style="left: 39.0434%; animation-duration: 5.46049s; animation-delay: 2.71105s;"></div><div class="particle" style="left: 63.116%; animation-duration: 10.9498s; animation-delay: 3.91915s;"></div><div class="particle" style="left: 39.8648%; animation-duration: 9.25322s; animation-delay: 3.90947s;"></div><div class="particle" style="left: 94.4493%; animation-duration: 5.4023s; animation-delay: 1.863s;"></div><div class="particle" style="left: 97.0963%; animation-duration: 13.9176s; animation-delay: 3.04734s;"></div><div class="particle" style="left: 73.2395%; animation-duration: 12.4568s; animation-delay: 1.25668s;"></div><div class="particle" style="left: 7.52286%; animation-duration: 11.1537s; animation-delay: 3.11635s;"></div><div class="particle" style="left: 98.6049%; animation-duration: 10.7137s; animation-delay: 3.96043s;"></div><div class="particle" style="left: 60.9314%; animation-duration: 9.7613s; animation-delay: 3.182s;"></div><div class="particle" style="left: 57.39%; animation-duration: 7.02032s; animation-delay: 2.61023s;"></div><div class="particle" style="left: 46.2503%; animation-duration: 12.8788s; animation-delay: 1.6824s;"></div><div class="particle" style="left: 31.0232%; animation-duration: 7.164s; animation-delay: 4.74229s;"></div><div class="particle" style="left: 60.6866%; animation-duration: 10.8505s; animation-delay: 2.30802s;"></div><div class="particle" style="left: 57.6395%; animation-duration: 9.12224s; animation-delay: 0.429837s;"></div><div class="particle" style="left: 29.4399%; animation-duration: 9.86281s; animation-delay: 2.03266s;"></div><div class="particle" style="left: 92.0217%; animation-duration: 14.9798s; animation-delay: 2.57995s;"></div><div class="particle" style="left: 87.8015%; animation-duration: 12.1523s; animation-delay: 3.05001s;"></div><div class="particle" style="left: 24.7666%; animation-duration: 11.1925s; animation-delay: 4.95922s;"></div><div class="particle" style="left: 81.414%; animation-duration: 5.83747s; animation-delay: 2.66797s;"></div><div class="particle" style="left: 63.4683%; animation-duration: 14.6034s; animation-delay: 1.38566s;"></div></div>
+
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">StellarBox-WinDesktop</div>
+            <ul class="nav-links">
+                <li><a href="https://gbonachea.github.io/">Inicio</a></li>
+                <li><a href="https://gbonachea.github.io/stellarbox.html#galeria">Galeria</a></li>
+                <li><a href="https://gbonachea.github.io/stellarbox.html#especificaciones">Especificaciones</a></li>
+                <li><a href="https://gbonachea.github.io/stellarbox.html#descargar">Descargar</a></li>
+                <li><a href="https://art-ripoll.github.io/">ARTRipoll</a></li>
+                <li><a href="https://stellar-store.github.io/">StellarStore</a></li>
+                <li><a href="https://hero-br.github.io/convertidor-picture.html">WebApps</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    
+    <section class="section" id="descripcion">
+        <h2 class="section-title">StellarBox-WinDesktop</h2>
+        <p class="section-subtitle">Sistema Operativo - Gestor de Escritorio - Entorno de Escritorio</p>
+        
+        <div class="content-block" style="opacity: 1; transform: translateY(0px); transition: 0.6s ease-out;">
+            <h3>¿Qué es Stellarbox-WinDesktop?</h3>
+            <p>Es un gestor de escritorio ligero que presenta gestion de iconos, widger y opciones multiples que pueden ser convinados en cualquier entorno de escritorio.</p>
+            <p>ESPECIFICACION.</p>
+            <p>Ideal para usar si usas un WM como desktop, creado en C++ y Qt, posee en sus opciones del menu para gestionar el sistema completo.</p>
+        </div>
+
+        <h2 class="section-title">StellarBox-WinDesktop</h2>
+        <p class="section-subtitle">Gestor de Escritorio</p>
+        
+        <div class="content-block" style="opacity: 1; transform: translateY(0px); transition: 0.6s ease-out;">
+            <h3>Stellarbox-WinDesktop Desktop<h3>
+            <p>Stellarbox-WinDesktop Desktop, escrritorio ligero, moderno y con una interfaz llamativa, desarrollado en Qt</p>
+            <p>ESPECIFICACION.</p>
+            <p>Stellarbox-WinDesktop como gestor de escritorio, SGP como panel, Daemon y Plugins Stellar (fork de LXQT) y sistema de configuracion propio, usa Qt 6.8 y puede ser instalado en cualquier distibucion.</p>
+        </div>
+
+       <h2 class="section-title">Stellar OS Windesktop</h2>
+        <p class="section-subtitle">Distribucion que usa StellarBox-WinDesktop/p>
+        
+        <div class="content-block" style="opacity: 1; transform: translateY(0px); transition: 0.6s ease-out;">
+            <h3>Stellar OS</h3>
+            <p>Sistema Operativo que usa Stellarbox WinDesktop como entorno de escritorio, un entorno ligero, moderno y que cumple con las demanas actuales.</p>
+            <p>ESPECIFICACION.</p>
+            <p>Creado usando Qt y Debian como sus pilares, SGP, StellarBox-WinDesktop, Navia Browser, Stellar Cleanes, Stellar Explorer.</p>
+        </div>
+        
+    </section>
+
+    <section class="section" id="galeria">
+        <h2 class="section-title">Galería de Imágenes</h2>
+        <p class="section-subtitle">Explora la interfaz y características visuales de StellarOS - StellarBox-WinDesktop</p>
+        
+        <div class="gallery">
+            <div class="gallery-item" style="opacity: 1; transform: translateY(0px); transition: 0.6s ease-out;">
+                <a href="./Stellarbox/Stellarbox.png" target="_blank">
+                    <img src="./Stellarbox/Stellarbox.png" alt="StellarBox" style="width: 100%; height: 100%; object-fit: contain; border-radius: 15px; cursor: pointer;">
+                </a>
+            </div>
+            <div class="gallery-item" style="opacity: 1; transform: translateY(0px); transition: 0.6s ease-out;">
+                <a href="./Stellarbox/Stellarboxexplorer.png" target="_blank">
+                    <img src="./Stellarbox/Stellarboxexplorer.png" alt="StellarBox" style="width: 100%; height: 100%; object-fit: contain; border-radius: 15px; cursor: pointer;">
+                </a>
+            </div>
+            <div class="gallery-item" style="opacity: 1; transform: translateY(0px); transition: 0.6s ease-out;">
+                <a href="./Stellarbox/StellarboxDock.png" target="_blank">
+                    <img src="./Stellarbox/StellarboxDock.png" alt="StellarBox" style="width: 100%; height: 100%; object-fit: contain; border-radius: 15px; cursor: pointer;">
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="especificaciones">
+        <h2 class="section-title">Especificaciones Técnicas</h2>
+        <p class="section-subtitle">Detalles Tecnicos</p>
+
+        <div class="content-block" style="opacity: 0; transform: translateY(30px); transition: 0.6s ease-out;">
+            <h3>StellarOS<h3>
+            <div class="specs-grid">
+                <div class="spec-item">
+                    <div class="spec-label">Sistema Operativo</div>
+                    <div class="spec-value">Debian 13.7</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">CONSUMO</div>
+                    <div class="spec-value"> MB</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">ALMACENAMIENTO</div>
+                    <div class="spec-value"> MB</div>
+                </div>
+                <div class="spec-item">
+                    <div class="spec-label">LENGUAJE Y LIBRERIA</div>
+                    <div class="spec-value">C++ / QT</div>
+                </div>
+            </div>
+        </div>
+
+    <section class="section" id="descargar">
+        <div class="download-section">
+            <h2>Descargas StellarOS</h2>
+            <a href="#" class="btn btn-primary">StellarOS</a>
+            <div class="version-info">Versión 0.1 • 64-bit</div>
+        </div>
+    </section>
+    <section class="section" id="descargar">
+        <div class="download-section">
+            <h2>Descargas StellarBox-WinDesktop Desktop</h2>
+            <a href="https://github.com/gbonachea/StellarWinDesktop/releases/download/Stellarbox-WinDesktop-v0.2.2/stellarbox-windesktop_0.2.2_amd64.deb" class="btn btn-primary">StellarBox-WinDesktop (Desktop) DEB</a>
+            <div class="version-info">Versión 0.2.2 • 64-bit</div>
+         </div>
+    </section>
+    <section class="section" id="descargar">
+        <div class="download-section">
+            <h2>Descargas StellarBox-WinDesktop</h2>
+            <a href="#" class="btn btn-primary">StellarBox-WinDesktop DEB</a>
+            <div class="version-info">Versión 1.0 • 64-bit</div>
+        </div>
+
+    </section>
+
+    <footer>
+        <p>© 2026 ART Ripoll. Desarrollado con ❤️ para la comunidad Linux.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Código abierto • Gratuito para siempre • Hecho por B&amp;R.Comp</p>
+    </footer>
+
+    <script>
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDuration = (Math.random() * 10 + 5) + 's';
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card, .content-block, .gallery-item').forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(30px)';
+            element.style.transition = 'all 0.6s ease-out';
+            observer.observe(element);
+        });
+    </script>
+
+
+
+</section><protonpass-root-e73e data-protonpass-role="root" data-protonpass-theme="os"><template shadowrootmode="closed"></template></protonpass-root-e73e></body></html>
